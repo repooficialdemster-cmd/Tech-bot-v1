@@ -114,21 +114,20 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       caption: details
     }, { quoted: m })
 
-    if (isAudio) {
-      await conn.sendMessage(m.chat, {
-        audio: { url: download },
-        mimetype: 'audio/mpeg',
-        fileName: `${videoInfo.title}.mp3`,
-        ptt: false
-      }, { quoted: m })
-    } else {
-      await conn.sendMessage(m.chat, {
-        video: { url: download },
-        mimetype: 'video/mp4',
-        fileName: `${videoInfo.title}.mp4`
-      }, { quoted: m })
-    }
-
+if (isAudio) {
+  await conn.sendMessage(m.chat, {
+    audio: { url: download },
+    mimetype: videoInfo.mimetype || 'audio/mp4', // usa el que viene o fallback
+    fileName: `${videoInfo.title}.${videoInfo.ext || 'm4a'}`,
+    ptt: false
+  }, { quoted: m })
+} else {
+  await conn.sendMessage(m.chat, {
+    video: { url: download },
+    mimetype: 'video/mp4',
+    fileName: `${videoInfo.title}.mp4`
+  }, { quoted: m })
+}
     await m.react('✅')
   } catch (e) {
     console.error(e)
