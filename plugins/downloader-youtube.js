@@ -119,7 +119,7 @@ if (isAudio) {
     audio: { url: download },
     mimetype: videoInfo.mimetype || 'audio/mp4', // usa el que viene o fallback
     fileName: `${videoInfo.title}.${videoInfo.ext || 'm4a'}`,
-    ptt: false
+    ptt: true
   }, { quoted: m })
 } else {
   await conn.sendMessage(m.chat, {
