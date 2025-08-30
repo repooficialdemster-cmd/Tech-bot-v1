@@ -3,14 +3,14 @@ import yts from 'yt-search'
 import fs from 'fs'
 import path from 'path'
 
+// === Archivos JSON para premium/limites ===
 const premiumFile = './json/premium.json'
 const limitsFile = './json/limits.json'
 
-// asegurar archivos
 if (!fs.existsSync(premiumFile)) fs.writeFileSync(premiumFile, JSON.stringify([]))
 if (!fs.existsSync(limitsFile)) fs.writeFileSync(limitsFile, JSON.stringify({}))
 
-// verifica si el bot es premium
+// === PREMIUM CHECK ===
 function isBotPremium(conn) {
   try {
     let data = JSON.parse(fs.readFileSync(premiumFile))
@@ -21,7 +21,7 @@ function isBotPremium(conn) {
   }
 }
 
-// controla límites
+// === LIMITES ===
 function checkLimit(conn) {
   const botId = conn?.user?.id?.split(':')[0]?.replace(/\D/g, '')
   if (!botId) return { allowed: false, remaining: 0 }
@@ -33,12 +33,10 @@ function checkLimit(conn) {
     limits[botId] = { count: 0, resetAt: now + 5 * 60 * 60 * 1000 } // 5h
   }
 
-  // reset si pasó el tiempo
   if (now > limits[botId].resetAt) {
     limits[botId] = { count: 0, resetAt: now + 5 * 60 * 60 * 1000 }
   }
 
-  // si aún tiene límite
   if (limits[botId].count < 10) {
     limits[botId].count++
     fs.writeFileSync(limitsFile, JSON.stringify(limits, null, 2))
@@ -48,35 +46,24 @@ function checkLimit(conn) {
   }
 }
 
+// === HANDLER PRINCIPAL ===
 let handler = async (m, { conn, args, command, usedPrefix }) => {
   if (!args[0]) return m.reply(`✳️ *Uso correcto:*\n${usedPrefix + command} <enlace o nombre>`)
 
   try {
     await m.react('⏳')
 
-    // 🔑 check premium
+    // Premium/Límites
     let premium = isBotPremium(conn)
     if (!premium) {
       let check = checkLimit(conn)
       if (!check.allowed) {
         let mins = Math.ceil((check.resetAt - Date.now()) / 60000)
         return m.reply(`⛔ Este bot no es Premium.\n\nHas alcanzado el límite de *10 descargas*.\n⌛ Intenta de nuevo en *${mins} minutos*.`)
-      } else {
-        console.log(`Bot normal → le quedan ${check.remaining} descargas.`)
       }
     }
 
-    const botActual = conn.user?.jid?.split('@')[0].replace(/\D/g, '')
-    const configPath = path.join('./JadiBots', botActual, 'config.json')
-
-    let nombreBot = global.namebot || '⎯⎯⎯⎯⎯⎯ Bot Principal ⎯⎯⎯⎯⎯⎯'
-    if (fs.existsSync(configPath)) {
-      try {
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'))
-        if (config.name) nombreBot = config.name
-      } catch {}
-    }
-
+    // Buscamos video
     let url = args[0]
     let videoInfo = null
 
@@ -94,49 +81,36 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       if (search && search.title) videoInfo = search
     }
 
-    if (videoInfo.seconds > 3780) {
-      await conn.sendMessage(m.chat, {
-        text: '❌ El video supera el límite de duración permitido (63 minutos).'
-      }, { quoted: m })
-      return
+    if (!videoInfo) return m.reply('❌ No se pudo obtener información del video.')
+    if (videoInfo.seconds > 600) {
+      return m.reply(`❌ El video supera el límite de *10 minutos*.\nDuración: ${videoInfo.timestamp}`)
     }
 
-    let apiUrl = ''
-    let isAudio = false
+    let isAudio = (command == 'play' || command == 'ytmp3')
 
-    if (command == 'play' || command == 'ytmp3') {
-      apiUrl = `https://myapiadonix.vercel.app/download/yt?url=${encodeURIComponent(url)}&format=mp3`
-      isAudio = true
-    } else if (command == 'play2' || command == 'ytmp4') {
-      apiUrl = `https://myapiadonix.vercel.app/download/ytmp4?url=${encodeURIComponent(url)}`
-    } else {
-      await conn.sendMessage(m.chat, {
-        text: '❌ Comando no reconocido.'
-      }, { quoted: m })
-      return
-    }
+    // 🔑 Usar la API de neoxr en vez de la antigua
+    let apiUrl = `https://api.neoxr.eu/api/youtube?url=${encodeURIComponent(url)}&type=${isAudio ? 'audio' : 'video'}&quality=${isAudio ? '128kbps' : '360p'}&apikey=russellxz`
 
     let res = await fetch(apiUrl)
     if (!res.ok) throw new Error('Error al conectar con la API.')
     let json = await res.json()
-    if (!json.success) throw new Error('No se pudo obtener información del video.')
+    if (!json.status || !json.data?.url) throw new Error('No se pudo obtener descarga.')
 
-    let { title, thumbnail, quality, download } = json.data
-    let duration = videoInfo?.timestamp || 'Desconocida'
+    let { url: download } = json.data
 
-    let details = `╭➤ *${title}*
+    // Mensaje de preview
+    let details = `╭➤ *${videoInfo.title}*
 ┃
-┃ ⏱️ Duración: *${duration}*
-┃
-┃ 🖥️ Calidad: *${quality}*
+┃ ⏱️ Duración: *${videoInfo.timestamp}*
+┃ 👤 Autor: *${videoInfo.author?.name || 'Desconocido'}*
+┃ 👁️ Vistas: *${videoInfo.views.toLocaleString()}*
 ┃
 ┃ ❇️ Formato: *${isAudio ? 'Audio' : 'Video'}*
-┃
 ┃ 📌 Fuente: *YouTube*
 ╰━━━━━━━━━━━━━━━━━━`.trim()
 
     await conn.sendMessage(m.chat, {
-      image: { url: thumbnail },
+      image: { url: videoInfo.thumbnail },
       caption: details
     }, { quoted: m })
 
@@ -144,14 +118,14 @@ let handler = async (m, { conn, args, command, usedPrefix }) => {
       await conn.sendMessage(m.chat, {
         audio: { url: download },
         mimetype: 'audio/mpeg',
-        fileName: `${title}.mp3`,
-        ptt: true
+        fileName: `${videoInfo.title}.mp3`,
+        ptt: false
       }, { quoted: m })
     } else {
       await conn.sendMessage(m.chat, {
         video: { url: download },
         mimetype: 'video/mp4',
-        fileName: `${title}.mp4`
+        fileName: `${videoInfo.title}.mp4`
       }, { quoted: m })
     }
 
