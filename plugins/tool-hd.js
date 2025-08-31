@@ -28,8 +28,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     if (!/image\/(jpe?g|png|webp)/.test(mime)) {  
       return conn.sendMessage(m.chat, {  
-        text: `✧ El formato (${mime}) no es compatible, usa JPG, PNG o WEBP.`,  
-        ...global.rcanal  
+        text: `⚠️ El formato (${mime}) no es compatible, usa JPG, PNG o WEBP.`
       }, { quoted: m })  
     }  
 
@@ -43,7 +42,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     let uploadedUrl = await uploadImage(img)  
 
     // Usar la nueva API
-    const apiUrl = `https://myapiadonix.vercel.app/api/ends/upscale?imageUrl=${encodeURIComponent(uploadedUrl)}`  
+    const apiUrl = `https://myapiadonix.vercel.app/tools/upscale?url=${encodeURIComponent(uploadedUrl)}`  
     const res = await fetch(apiUrl)  
     if (!res.ok) throw new Error(`Error en la API: ${res.statusText}`)  
     const data = await res.json()  
