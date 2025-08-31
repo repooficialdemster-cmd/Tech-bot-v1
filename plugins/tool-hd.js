@@ -22,7 +22,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     if (!mime) {  
       return conn.sendMessage(m.chat, {  
-        text: `✳️ Por favor, envía una imagen o responde a una imagen usando *${usedPrefix + command}*`
+        text: `❇️ Por favor, envía una imagen o responde a una imagen usando *${usedPrefix + command}*`
       }, { quoted: m })  
     }  
 
@@ -41,15 +41,15 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     let uploadedUrl = await uploadImage(img)  
 
-    // Usar la nueva API
+    // --> Usar la nueva API
     const apiUrl = `https://myapiadonix.vercel.app/tools/upscale?url=${encodeURIComponent(uploadedUrl)}`  
     const res = await fetch(apiUrl)  
     if (!res.ok) throw new Error(`Error en la API: ${res.statusText}`)  
     const data = await res.json()  
 
-    if (data.status !== 'success' || !data.result_url) throw new Error('No se pudo mejorar la imagen.')  
+    if (!data.status || !data.result) throw new Error('No se pudo mejorar la imagen.')  
 
-    const improvedRes = await fetch(data.result_url)  
+    const improvedRes = await fetch(data.result)  
     const buffer = await improvedRes.buffer()  
 
     await conn.sendMessage(m.chat, {  
@@ -63,7 +63,8 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     console.error(e)
     await m.react('✖️')
     await conn.sendMessage(m.chat, {
-      text: '❌ Error al mejorar la imagen, inténtalo más tarde.'
+      text: '❌ Error al mejorar la imagen, inténtalo más tarde.',
+      ...global.rcanal
     }, { quoted: m })
   }
 }
