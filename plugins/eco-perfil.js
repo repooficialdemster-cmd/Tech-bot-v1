@@ -22,8 +22,7 @@ let handler = async (m, { conn }) => {
 
   await conn.sendMessage(m.chat, {
     image: { url: pp },
-    caption: textoPerfil,
-    ...global.rcanal
+    caption: textoPerfil
   }, { quoted: m })
 }
 
