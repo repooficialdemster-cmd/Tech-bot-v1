@@ -342,34 +342,29 @@ continuelet noPrefix = ''
 let command = ''
 let args = []
 
-if ((usedPrefix = (match[0] || '')[0])) {
-    noPrefix = m.text.replace(usedPrefix, '')
-    ;[command, ...args] = noPrefix.trim().split(/\s+/).filter(v => v)
+if ((usedPrefix = (match[0] || '')[0])) { 
+    let noPrefix = m.text.replace(usedPrefix, '')
+    let [command, ...args] = noPrefix.trim().split` `.filter(v => v)
 
-    // cooldown y escritura simulada
+    // 🕐 Cooldown y simulación de escritura
     let userData = global.db.data.users[m.sender] || {}
     let now = Date.now()
-    let cd = 1500 + Math.floor(Math.random() * 1000)
-
-    if (userData.lastCmd && (now - userData.lastCmd < 1000)) return
+    let cd = 1500 + Math.floor(Math.random() * 1000) // entre 1.5s y 2.5s
+    if (userData.lastCmd && (now - userData.lastCmd < cd)) {
+        return // evita flood sospechoso
+    }
     userData.lastCmd = now
     global.db.data.users[m.sender] = userData
 
-    try {
-        await this.readMessages([m.key])
-        await this.sendPresenceUpdate('composing', m.chat)
-        await delay(cd)
-        await this.sendPresenceUpdate('paused', m.chat)
-    } catch (e) {
-        console.error('❌ Error en presencia:', e)
-    }
-}
+    // marcar como visto y simular escritura
+    await this.readMessages([m.key])
+    await this.sendPresenceUpdate('composing', m.chat)
+    await delay(cd)
 
-// acá ya podés usar `args`, `noPrefix` y `command` sin que explote
-args = args || []
-let _args = noPrefix.trim().split` `.slice(1)
-let text = _args.join` `
-command = (command || '').toLowerCase()
+    args = args || []
+    let _args = noPrefix.trim().split` `.slice(1)
+    let text = _args.join` `
+    command = (command || '').toLowerCase()
 let fail = plugin.fail || global.dfail
 let isAccept = plugin.command instanceof RegExp ? 
 plugin.command.test(command) :
