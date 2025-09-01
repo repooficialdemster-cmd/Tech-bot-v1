@@ -338,7 +338,8 @@ __filename
 continue
 }
 if (typeof plugin !== 'function')
-continueif ((usedPrefix = (match[0] || '')[0])) {
+continue
+  if ((usedPrefix = (match[0] || '')[0])) {
     let noPrefix = m.text.replace(usedPrefix, '')
     let [command, ...args] = noPrefix.trim().split` `.filter(v => v)
 
