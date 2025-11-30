@@ -4,7 +4,7 @@ import fs from 'fs'
 import { fileURLToPath } from 'url'
 
 global.owner = [
-  ['584125877491', 'wilker s.js', true],
+  ['5492644893953', 'WILKER OFC', true],
   ['573133374132', 'yo soy yo', true],
   ['114847912059070', 'ghostdev.js', true],
   ['114847912059070', 'Yo Soy Yo', true],
