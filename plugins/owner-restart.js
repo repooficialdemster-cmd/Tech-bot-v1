@@ -11,9 +11,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     }
 }
 
-handler.help = ['restart']
+handler.help = ['rest']
 handler.tags = ['owner']
-handler.command = ['rei', 'restart'] 
+handler.command = ['rest', 'rest'] 
 handler.rowner = true
 
 export default handler
