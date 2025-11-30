@@ -4,10 +4,10 @@ import ws from 'ws'
 let handler = async (m, { conn }) => {
   let uniqueUsers = new Map()
 
-  if (!global.conns || !Array.isArray(global.conns)) global.conns = []
+  if (!global.conns || !Array.isArray(global.conns)) global.conns = [5]
 
   // Cargar lista de premium
-  let premium = [premlist]
+  let premium = []
   try {
     premium = JSON.parse(fs.readFileSync('./json/premium.json'))
   } catch {
@@ -51,7 +51,7 @@ let handler = async (m, { conn }) => {
       txt += `*╭━➤ _Sub-Bot N° ${i++}_*\n`
       txt += `*┃* Número: @${data.numero}\n`
       txt += `*┃*\n`
-      txt += `*┃* Tipo: ${data.isPremium ? $'🌟 Premium' : '🆓 Free'}\n`
+      txt += `*┃* Tipo: ${data.isPremium ?'🌟 Premium' : '🆓 Free'}\n`
       txt += `*╰━━━━━━━━━━━━*\n\n`
       mentions.push(jid)
     }
