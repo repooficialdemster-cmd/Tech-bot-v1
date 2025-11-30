@@ -97,15 +97,15 @@ yukiJadiBot(yukiJBOptions)
 global.db.data.users[m.sender].Subs = new Date * 1
 } 
 
-handler.help = ['serqr', 'sercode']
+handler.help = ['qr', 'code']
 handler.tags = ['other']
-handler.command = ['serqr', 'sercode']
+handler.command = ['code', 'qr']
 export default handler 
 
 export async function yukiJadiBot(options) {
 let { pathYukiJadiBot, m, conn, args, usedPrefix, command, phoneNumber } = options
-if (command === 'sercode') {
-command = 'serqr'; 
+if (command === 'code') {
+command = 'qr'; 
 args.unshift('code')}
 const mcode = args[0] && /(--code|code)/.test(args[0].trim()) ? true : args[1] && /(--code|code)/.test(args[1].trim()) ? true : false
 let txtCode, codeBot, txtQR
