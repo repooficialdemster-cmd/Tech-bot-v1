@@ -41,15 +41,18 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     let uploadedUrl = await uploadImage(img)  
 
-    // --> Usar la nueva API
-    const apiUrl = `https://myapiadonix.vercel.app/tools/upscale?url=${encodeURIComponent(uploadedUrl)}`  
+    // --> Usar la nueva API de Adonix
+    const apiUrl = `https://api-adonix.ultraplus.click/canvas/hd?apikey=Tech1Keytz05np9565&url=${encodeURIComponent(uploadedUrl)}`  
     const res = await fetch(apiUrl)  
     if (!res.ok) throw new Error(`Error en la API: ${res.statusText}`)  
     const data = await res.json()  
 
+    // Verificar la respuesta de la nueva API
     if (!data.status || !data.result) throw new Error('No se pudo mejorar la imagen.')  
 
+    // Descargar la imagen mejorada
     const improvedRes = await fetch(data.result)  
+    if (!improvedRes.ok) throw new Error('Error al descargar la imagen mejorada')
     const buffer = await improvedRes.buffer()  
 
     await conn.sendMessage(m.chat, {  
