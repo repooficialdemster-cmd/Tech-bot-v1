@@ -13,20 +13,20 @@ var handler = async (m, { conn, args, usedPrefix, command }) => {
     }
     
     if (!args[0]) {
-        throw m.reply(`*[ 🕸️ ] Has olvidado el vínculo... ¿Acaso temes revelar el portal?*\n\n*[ 🧠 ] Ejemplo:* ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/`);
+        throw m.reply(`*[ 🕸️ ] Has olvidado el comando... ¿tiktok <enlace>?*\n\n*[ 🧠 ] Ejemplo:* ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/`);
     }
 
     if (!args[0].match(/(https?:\/\/)?(www\.)?(vm\.|vt\.)?tiktok\.com\//)) {
-        throw m.reply(`*[ ⚠️ ] Ese enlace no pertenece al reino de TikTok. No intentes engañar a la sombra.*`);
+        throw m.reply(`*[ ⚠️ ] Ese enlace no pertenece a un vídeo de tiktok.*`);
     }
 
     try {
-        await conn.reply(m.chat, "*[ ⏳ ] Invocando el arte prohibido... Preparando la transferencia dimensional...*", m);
+        await conn.reply(m.chat, "*[ ⏳ ] enviando tu video...*", m);
 
         const tiktokData = await tiktokdl(args[0]);
 
         if (!tiktokData || !tiktokData.data) {
-            throw m.reply("*[ 🕳️ ] La sombra no pudo extraer el contenido. El vínculo está corrompido.*");
+            throw m.reply("*[ 🕳️ ] tech bot v1 no encontró tu video.*");
         }
 
         const videoURL = tiktokData.data.play;
@@ -37,7 +37,7 @@ var handler = async (m, { conn, args, usedPrefix, command }) => {
             await conn.sendFile(
                 m.chat,
                 videoURL,
-                "shadow_tiktok.mp4",
+                "tech_tiktok.mp4",
                 `*[ 💎 ] TRANSMISIÓN COMPLETADA - USUARIO ${isOwner ? 'OWNER' : 'PREMIUM'}*\n\n${shadowInfo}`,
                 m
             );
