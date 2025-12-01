@@ -99,7 +99,7 @@ global.db.data.users[m.sender].Subs = new Date * 1
 
 handler.help = ['qr', 'code']
 handler.tags = ['other']
-handler.command = ['code 54', 'qr']
+handler.command = ['code', 'qr']
 export default handler 
 
 export async function yukiJadiBot(options) {
