@@ -41,17 +41,17 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     let uploadedUrl = await uploadImage(img)  
 
-    // --> Usar la nueva API de Adonix
-    const apiUrl = `https://api-adonix.ultraplus.click/canvas/hd?apikey=Tech1Keytz05np9565=${encodeURIComponent(uploadedUrl)}`  
+    // --> Usar la nueva API de Neoxr
+    const apiUrl = `https://api.neoxr.eu/api/wallpaper-hd?url=${encodeURIComponent(uploadedUrl)}&apikey=srohX8`  
     const res = await fetch(apiUrl)  
     if (!res.ok) throw new Error(`Error en la API: ${res.statusText}`)  
     const data = await res.json()  
 
     // Verificar la respuesta de la nueva API
-    if (!data.status || !data.result) throw new Error('No se pudo mejorar la imagen.')  
+    if (!data.success || !data.data) throw new Error('No se pudo mejorar la imagen.')  
 
     // Descargar la imagen mejorada
-    const improvedRes = await fetch(data.result)  
+    const improvedRes = await fetch(data.data.url)  
     if (!improvedRes.ok) throw new Error('Error al descargar la imagen mejorada')
     const buffer = await improvedRes.buffer()  
 
