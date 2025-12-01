@@ -24,49 +24,89 @@ const handler = async (m, { conn, args, usedPrefix, text, command }) => {
   if (!text) return m.reply(`⏳ Ingresa una búsqueda para TikTok\n> *Ejemplo:* ${usedPrefix + command} haikyuu edit`)
 
   try {
-    // Primero buscamos los videos
-    let searchRes = await fetch(`https://apizell.web.id/download/tiktokplay?q=${encodeURIComponent(text)}`)
+    // Usar la nueva API Adonix para búsqueda
+    let searchUrl = `https://api-adonix.ultraplus.click/search/tiktok?query=${encodeURIComponent(text)}&apikey=DemonKeytechbot`
+    
+    let searchRes = await fetch(searchUrl)
     let searchJson = await searchRes.json()
+    
+    console.log('API Response:', JSON.stringify(searchJson, null, 2)) // Para debug
 
-    if (!searchJson.status || !searchJson.data || !searchJson.data.length) {
-      return m.reply('❌ No se encontró ningún video.')
+    // Verificar diferentes formatos de respuesta posibles
+    if (!searchJson || (!searchJson.data && !searchJson.result && !searchJson.videos)) {
+      return m.reply('❌ La API no devolvió resultados válidos.')
     }
 
-    let vid = searchJson.data[0]
+    // Extraer datos según la estructura de respuesta
+    let videos = [];
     
-    // Ahora obtenemos la URL de descarga usando la nueva API
-    let downloadUrl = `https://api.neoxr.eu/api/tiktok?url=${encodeURIComponent(vid.url)}&apikey=srohX8`
-    let downloadRes = await fetch(downloadUrl)
-    let downloadJson = await downloadRes.json()
+    if (searchJson.data && Array.isArray(searchJson.data)) {
+      videos = searchJson.data
+    } else if (searchJson.result && Array.isArray(searchJson.result)) {
+      videos = searchJson.result
+    } else if (searchJson.videos && Array.isArray(searchJson.videos)) {
+      videos = searchJson.videos
+    } else if (searchJson.status && searchJson.data && Array.isArray(searchJson.data)) {
+      videos = searchJson.data
+    } else if (Array.isArray(searchJson)) {
+      videos = searchJson
+    }
     
-    if (!downloadJson.status || !downloadJson.data || !downloadJson.data.nowm) {
-      // Si falla la nueva API, intentamos con la URL original
-      downloadUrl = vid.url
-    } else {
-      downloadUrl = downloadJson.data.nowm // URL sin marca de agua
+    if (!videos.length) {
+      return m.reply('❌ No se encontraron videos con esa búsqueda.')
     }
 
-    let caption = `📎 *Título:* ${vid.title || 'Sin título'}\n\n` +
-                  `👤 *Autor:* ${vid.author || 'Desconocido'}\n` +
-                  `👀 *Vistas:* ${vid.views ? vid.views.toLocaleString() : 'N/A'}\n` +
-                  `🔗 *URL:* ${vid.url}`
+    // Tomar el primer video
+    let vid = videos[0]
+    
+    // Extraer información del video basado en diferentes estructuras posibles
+    let videoInfo = {
+      title: vid.title || vid.desc || vid.description || 'Video de TikTok',
+      author: vid.author || vid.authorName || vid.author?.nickname || vid.nickname || 'Usuario',
+      views: vid.playCount || vid.viewCount || vid.views || vid.play || 0,
+      url: vid.play || vid.videoUrl || vid.url || vid.video || vid.download,
+      thumbnail: vid.cover || vid.thumbnail || vid.thumb
+    }
+    
+    console.log('Video info:', videoInfo) // Para debug
 
-    // Enviamos el video
-    await conn.sendMessage(m.chat, {
-      video: { url: downloadUrl },
+    if (!videoInfo.url) {
+      // Si no hay URL directa, intentar construirla
+      if (vid.id) {
+        videoInfo.url = `https://api-adonix.ultraplus.click/download/tiktok?id=${vid.id}&apikey=DemonKeytechbot`
+      } else {
+        return m.reply('❌ No se pudo obtener el enlace del video.')
+      }
+    }
+
+    let caption = `📎 *Título:* ${videoInfo.title}\n\n` +
+                  `👤 *Autor:* ${videoInfo.author}\n` +
+                  `👀 *Vistas:* ${videoInfo.views.toLocaleString()}\n` +
+                  `🔗 *Descargado via:* Adonix API`
+
+    // Enviar video con thumbnail si está disponible
+    let messageOptions = {
+      video: { url: videoInfo.url },
       caption: caption,
       fileName: `tiktok_${Date.now()}.mp4`,
       mimetype: 'video/mp4'
-    }, { quoted: m })
+    }
+    
+    // Añadir thumbnail si existe
+    if (videoInfo.thumbnail) {
+      messageOptions.jpegThumbnail = await (await fetch(videoInfo.thumbnail)).buffer()
+    }
+
+    await conn.sendMessage(m.chat, messageOptions, { quoted: m })
 
   } catch (error) {
     console.error('Error en TikTok downloader:', error)
-    return m.reply('❌ Error al descargar el video de TikTok. Intenta de nuevo.')
+    return m.reply(`❌ Error al procesar la solicitud:\n\`\`\`${error.message}\`\`\``)
   }
 }
 
 handler.help = ['tiktokvid']
 handler.tags = ['downloader']
-handler.command = ['tiktokvid', 'playtiktok']
+handler.command = ['tiktokvid', 'playtiktok', 'ttvid']
 handler.register = true
 export default handler
