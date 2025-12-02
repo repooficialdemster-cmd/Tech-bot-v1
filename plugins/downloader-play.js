@@ -86,8 +86,8 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
     }
 
     const apiUrl = type === "mp3"
-      ? `https://api-adonix.ultraplus.click/download/ytaudio?url=${encodeURIComponent(url)}&apikey=AdonixKeyuxuacv6765`
-      : `https://api-adonix.ultraplus.click/download/ytvideo?url=${encodeURIComponent(url)}&apikey=AdonixKeyuxuacv6765`
+      ? `https://api-adonix.ultraplus.click/download/ytaudio?url=${encodeURIComponent(url)}&apikey=DemonKeytechbot`
+      : `https://api-adonix.ultraplus.click/download/ytvideo?url=${encodeURIComponent(url)}&apikey=DemonKeytechbot`
 
     const response = await fetch(apiUrl)
     const data = await response.json()
