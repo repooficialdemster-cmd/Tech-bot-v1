@@ -41,29 +41,35 @@ let handler = async (m, { conn, usedPrefix, command }) => {
 
     let uploadedUrl = await uploadImage(img)  
 
-    // --> Usar la nueva API
-    const apiUrl = `https://api-adonix.ultraplus.click/canvas/hd?apikey=DemonKeytechbot`  
+    // --> Usar la nueva API de UltraPlus
+    const apiUrl = `https://api-adonix.ultraplus.click/canvas/hd?apikey=DemonKeytechbot&url=${encodeURIComponent(uploadedUrl)}`  
     const res = await fetch(apiUrl)  
     if (!res.ok) throw new Error(`Error en la API: ${res.statusText}`)  
-    const data = await res.json()  
+    
+    // Verificar el tipo de respuesta
+    const contentType = res.headers.get('content-type')
+    
+    if (contentType && contentType.includes('application/json')) {
+      // Si la respuesta es JSON (probablemente un error)
+      const errorData = await res.json()
+      throw new Error(errorData.message || 'Error en la API de mejora')
+    } else {
+      // Si la respuesta es una imagen directamente
+      const buffer = await res.buffer()
+      
+      await conn.sendMessage(m.chat, {  
+        image: buffer,  
+        caption: '✅ *Imagen mejorada con éxito*'
+      }, { quoted: m })  
 
-    if (!data.status || !data.result) throw new Error('No se pudo mejorar la imagen.')  
-
-    const improvedRes = await fetch(data.result)  
-    const buffer = await improvedRes.buffer()  
-
-    await conn.sendMessage(m.chat, {  
-      image: buffer,  
-      caption: '✅ *Imagen mejorada con éxito*'
-    }, { quoted: m })  
-
-    await m.react('✅')
+      await m.react('✅')
+    }
 
   } catch (e) {
     console.error(e)
     await m.react('✖️')
     await conn.sendMessage(m.chat, {
-      text: '❌ Error al mejorar la imagen, inténtalo más tarde.',
+      text: `❌ Error al mejorar la imagen: ${e.message}`,
       ...global.rcanal
     }, { quoted: m })
   }
