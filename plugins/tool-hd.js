@@ -42,7 +42,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     let uploadedUrl = await uploadImage(img)  
 
     // --> Usar la nueva API
-    const apiUrl = `https://api-adonix.ultraplus.click/canvas/hd?apikey=DemonKeytechbot?url=${encodeURIComponent(uploadedUrl)}`  
+    const apiUrl = `https://api-adonix.ultraplus.click/canvas/hd?apikey=DemonKeytechbot`  
     const res = await fetch(apiUrl)  
     if (!res.ok) throw new Error(`Error en la API: ${res.statusText}`)  
     const data = await res.json()  
