@@ -2,10 +2,9 @@ import yts from "yt-search"
 import fetch from "node-fetch"
 
 const handler = async (m, { conn, text, command }) => {
-  if (!text) return m.reply(`☯️ *Shadow-BOT-MD — Protocolo de Invocación*
+  if (!text) return m.reply(`☯️ *Tech bot v1 — está buscando tu pedido*
 
-Pronuncia el nombre del video o entrega el vínculo de YouTube...
-y la sombra ejecutará tu voluntad.`)
+Pronuncia el nombre del video o entrega el vínculo de YouTube..`)
 
   await m.react("🌌")
 
@@ -20,9 +19,9 @@ y la sombra ejecutará tu voluntad.`)
     if (!text.startsWith("https://")) {
       const res = await yts(text)
       if (!res || !res.videos || res.videos.length === 0) {
-        return m.reply(`☯️ *Shadow-BOT-MD — Protocolo de Invocación*
+        return m.reply(`☯️ *Tech bot v1 — Protocolo te envio*
 
-Nada fue hallado en las tinieblas...
+Nada fue encontrado...
 Intenta con un nombre más preciso.`)
       }
 
@@ -43,7 +42,7 @@ Intenta con un nombre más preciso.`)
     } else if (isVideo) {
       await downloadMedia(conn, m, url, title, thumbnail, "mp4")
     } else {
-      await m.reply(`☯️ *Shadow-BOT-MD — Análisis de Objetivo*
+      await m.reply(`☯️ *Tech bot v1— Análisis de Objetivo*
 
 『🎭』 Título: ${title}
 ✦ Canal: ${authorName}
@@ -57,7 +56,7 @@ Comandos disponibles:
 
   } catch (error) {
     console.error("Error general:", error)
-    await m.reply(`☯️ *Shadow-BOT-MD — Falla en la ejecución*
+    await m.reply(`☯️ *Tech bot v1— Falla en la ejecución*
 
 Algo perturbó el flujo de las sombras...
 Error: ${error.message}`)
@@ -69,7 +68,7 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
   try {
     const cleanTitle = cleanName(title) + (type === "mp3" ? ".mp3" : ".mp4")
 
-    const msg = `☯️ *Shadow-BOT-MD — Descarga en curso*
+    const msg = `☯️ *tech bot v1 — Descarga en curso*
 
 『🎭』 Título: ${title}
 Invocando tu ${type === "mp3" ? "audio espectral" : "video oculto"}...`
@@ -85,7 +84,7 @@ Invocando tu ${type === "mp3" ? "audio espectral" : "video oculto"}...`
     const data = await response.json()
 
     if (!data || !data.status || !data.result || !data.result.url) {
-      throw new Error("No se pudo obtener el archivo desde las sombras.")
+      throw new Error("No se pudo obtener el archivo hay un error en la api.")
     }
 
     if (type === "mp3") {
@@ -102,20 +101,20 @@ Invocando tu ${type === "mp3" ? "audio espectral" : "video oculto"}...`
       }, { quoted: m })
     }
 
-    const doneMsg = `☯️ *Shadow-BOT-MD — Transferencia completada*
+    const doneMsg = `☯️ *Tech bot v1— Transferencia completada*
 
 『🎭』 Título: ${data.result.title || title}
 ✦ Tipo: ${type === "mp3" ? "Audio" : "Video"}
 ✦ Estado: Descargado con precisión letal.
 
-Disfrútalo... como si fuera el último eco de tu misión.`
+Disfrútalo... como si fuera el último día en la tierra.`
 
     await m.reply(doneMsg)
     await m.react("✅")
 
   } catch (error) {
     console.error("Error descargando:", error)
-    const errorMsg = `☯️ *Shadow-BOT-MD — Error en la operación*
+    const errorMsg = `☯️ *Tech bot v1 — Error en la operación*
 
 『🎭』 Título: ${title}
 Algo falló en la ejecución...
