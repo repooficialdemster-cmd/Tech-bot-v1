@@ -62,7 +62,7 @@ const handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 
     // --- 📌 Descarga de Instagram ---
-    const response = await fetch(`https://api.dorratz.com/igdl?url=${encodeURIComponent(text)}`)
+    const response = await fetch(`https://api-adonix.ultraplus.click/download/instagram?apikey=DemonKeytechbot$=url{encodeURIComponent(text)}`)
     const json = await response.json()
 
     if (!json.data || !Array.isArray(json.data) || json.data.length === 0) {
