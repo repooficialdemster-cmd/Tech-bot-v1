@@ -167,6 +167,6 @@ const greetingMap = {
   12: 'un lindo día ❄', 13: 'un lindo día 🌤', 14: 'una linda tarde 🌇',
   15: 'un lindo dia 🥀', 16: 'una linda tarde 🌹', 17: 'una linda tarde 🌆',
   18: 'un lindo dia 🌙', 19: 'un lindo dia 🌃', 20: 'un buen dia 🌌',
-  21: 'un lindo dia 🌃', 22: 'un lindo dia 🌙', 23: 'un lindo dia 🌃',
+  21: 'un lindo dia 🌃', 22: 'una linda noche 🌙', 23: 'una linda noche 🌃',
 }
 var greeting = 'Espero que tengas ' + (greetingMap[hour] || 'un buen día')
