@@ -1,4 +1,3 @@
-import axios from 'axios'
 import fs from 'fs'
 const premiumFile = './json/premium.json'
 
@@ -22,7 +21,7 @@ const handler = async (m, { conn, args, usedPrefix, text, command }) => {
   }
   if (!text) return m.reply(`⏳ Ingresa una búsqueda para TikTok\n> *Ejemplo:* ${usedPrefix + command} haikyuu edit`)
 
-  let res = await fetch(`https://api-adonix.ultraplus.click/search/tiktok?apikey=DemonKeytechbot=${encodeURIComponent(text)}`)
+  let res = await fetch(`https://api-adonix.ultraplus.click/download/tiktok?apikey=DemonKeytechbot&query=${encodeURIComponent(text)}`)
   let json = await res.json()
 
   if (!json.status || !json.data || !json.data.length) return m.reply('❌ No se encontró ningún video.')
