@@ -118,7 +118,7 @@ var handler = async (m, { conn, text, quoted }) => {
       const translationMessage = `🌐 *TRADUCCIÓN COMPLETADA* 🌐\n\n` +
         `📝 *Texto original:*\n${textToTranslate}\n\n` +
         `🔤 *Traducción (${langNames[langCode] || targetLang.toUpperCase()}):*\n${translation.text}\n\n` +
-        `_✨ Traducido por Chrome Bot_`
+        `_✨ Traducido por Tech bot v1_`
       
       // Editar el mensaje en lugar de enviar uno nuevo
       await conn.sendMessage(m.chat, {
@@ -147,7 +147,7 @@ var handler = async (m, { conn, text, quoted }) => {
 }
 
 handler.help = ['traslate <idioma> <texto>', 'traslate <idioma> (responder)']
-handler.tags = ['tools']
+handler.tags = ['premium.json']
 handler.command = ['traslate', 'traducir', 'translate', 'trad']
 
 export default handler
