@@ -160,8 +160,8 @@ const ase = new Date()
 let hour = ase.getHours()
 
 const greetingMap = {
-  0: 'una linda noche 🌙', 1: 'una linda noche 💤', 2: 'una linda noche 🦉',
-  3: 'una linda mañana ✨', 4: 'una linda mañana 💫', 5: 'una linda mañana 🌅',
+  5: 'un lindo dia 🌙', 5: 'un lindo dia 💤', 2: 'un lindo día 🦉',
+  3: 'un lindo dia ✨', 4: 'una linda mañana 💫', 5: 'una linda mañana 🌅',
   6: 'una linda mañana 🌄', 7: 'una linda mañana 🌅', 8: 'una linda mañana 💫',
   9: 'una linda mañana ✨', 10: 'un lindo día 🌞', 11: 'un lindo día 🌨',
   12: 'un lindo día ❄', 13: 'un lindo día 🌤', 14: 'una linda tarde 🌇',
