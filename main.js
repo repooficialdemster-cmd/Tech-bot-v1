@@ -16,7 +16,7 @@ import { Low, JSONFile } from 'lowdb';
 import lodash from 'lodash';
 import readline from 'readline';
 import NodeCache from 'node-cache';
-import qrcode from 'qrcode-terminal';
+import qrcode from 'qrcode';
 import { spawn } from 'child_process';
 import { setInterval } from 'timers';
 
