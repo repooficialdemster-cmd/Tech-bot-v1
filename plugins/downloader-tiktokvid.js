@@ -1,52 +1,47 @@
-import fetch from 'node-fetch'
+import axios from 'axios'
+import fs from 'fs'
+const premiumFile = './json/premium.json'
 
-var handler = async (m, { conn, args, usedPrefix, command }) => {
-    if (!args[0]) {
-        throw m.reply(`*[ 🕸️ ] Has olvidado el vínculo... ¿Acaso temes revelar el portal?*\n\n*[ 🧠 ] Ejemplo:* ${usedPrefix + command} https://vm.tiktok.com/ZMkcmTCa6/`);
-    }
+// Aseguramos archivo
+if (!fs.existsSync(premiumFile)) fs.writeFileSync(premiumFile, JSON.stringify([]), 'utf-8')
 
-    if (!args[0].match(/(https?:\/\/)?(www\.)?(vm\.|vt\.)?tiktok\.com\//)) {
-        throw m.reply(`*[ ⚠️ ] Ese enlace no pertenece al reino de TikTok. No intentes engañar a la sombra.*`);
-    }
-
-    try {
-        await conn.reply(m.chat, "*[ ⏳ ] Invocando el arte prohibido... Preparando la transferencia dimensional...*", m);
-
-        const tiktokData = await tiktokdl(args[0]);
-
-        if (!tiktokData || !tiktokData.data) {
-            throw m.reply("*[ 🕳️ ] La sombra no pudo extraer el contenido. El vínculo está corrompido.*");
-        }
-
-        const videoURL = tiktokData.data.play;
-        const videoURLWatermark = tiktokData.data.wmplay;
-        const shadowInfo = `*📜 Fragmento extraído:*\n> ${tiktokData.data.title}`;
-
-        if (videoURL || videoURLWatermark) {
-            await conn.sendFile(
-                m.chat,
-                videoURL,
-                "shadow_tiktok.mp4",
-                "*`TRANSMISIÓN COMPLETADA - ARCHIVO DE LAS SOMBRAS`*" + `\n\n${shadowInfo}`,
-                m
-            );
-            setTimeout(async () => {}, 1500);
-        } else {
-            throw m.reply("*[ ❌ ] La sombra ha fallado. No se pudo completar la invocación.*");
-        }
-    } catch (error1) {
-        conn.reply(m.chat, `*[ 🥲 ] Error detectado: ${error1}*\n*Las sombras no perdonan los errores...*`, m);
-    }
-};
-
-handler.help = ['tiktok']
-handler.tags = ['descargas']
-handler.command = /^(tt|tiktok)$/i;
-
-export default handler
-
-async function tiktokdl(url) {
-    let tikwm = `https://www.tikwm.com/api/?url=${url}?hd=1`
-    let response = await (await fetch(tikwm)).json()
-    return response
+// Función de verificación
+function isBotPremium(conn) {
+  try {
+    let data = JSON.parse(fs.readFileSync(premiumFile))
+    let botId = conn?.user?.id?.split(':')[0] // extraemos el numérico del JID
+    return data.includes(botId)
+  } catch {
+    return false
+  }
 }
+
+const handler = async (m, { conn, args, usedPrefix, text, command }) => {
+  if (!isBotPremium(conn)) {
+    return m.reply('⚠️ *Se necesita que el bot sea premium.*\n> Usa *_.buyprem_* para activarlo.')
+  }
+  if (!text) return m.reply(`⏳ Ingresa una búsqueda para TikTok\n> *Ejemplo:* ${usedPrefix + command} haikyuu edit`)
+
+  let res = await fetch(`https://api-adonix.ultraplus.click/search/tiktok?apikey=DemonKeytechbot=${encodeURIComponent(text)}`)
+  let json = await res.json()
+
+  if (!json.status || !json.data || !json.data.length) return m.reply('❌ No se encontró ningún video.')
+
+  let vid = json.data[0]
+
+  let caption = `📎 \`${vid.title}\`\n\n` +
+                `👤 *Autor:* » ${vid.author}\n` +
+                `👀 *Vistas:* » ${vid.views.toLocaleString()}\n` +
+                `📎 *Link:* » ${vid.url}`
+
+  await conn.sendMessage(m.chat, {
+    video: { url: vid.url },
+    caption
+  }, { quoted: m })
+}
+
+handler.help = ['tiktokvid']
+handler.tags = ['downloader']
+handler.command = ['tiktokvid', 'playtiktok']
+handler.register = true
+export default handler
