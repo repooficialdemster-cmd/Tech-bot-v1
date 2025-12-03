@@ -2,10 +2,14 @@
 
 > Creador del bot
 
-> 🔶 WILKERSON/S
+> 🔶 WILKER OFC
 
 > COLABORADORES OFICIALES
 
-> 🔶 Damian_yt
+> 🔶 Damian_yt aporta número
 
-> BOT EN DESARROLLO 
+> 🔶 Shadow aporta apis
+
+> 🔶 Ado21 cambia apis
+
+> 🔶 BOT EN DESARROLLO 
