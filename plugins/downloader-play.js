@@ -2,7 +2,7 @@ import yts from "yt-search"
 import fetch from "node-fetch"
 
 const handler = async (m, { conn, text, command }) => {
-  if (!text) return m.reply(`🎄 *Shadow — Invocación navideña*
+  if (!text) return m.reply(`🎄 *Tech bot v1 invocando*
 
 ✨ Pronuncia el nombre del video o entrega el enlace de YouTube.`)
 
@@ -19,7 +19,7 @@ const handler = async (m, { conn, text, command }) => {
     if (!text.startsWith("https://")) {
       const res = await yts(text)
       if (!res?.videos?.length) {
-        return m.reply(`🎄 *Shadow — Buscador navideño*
+        return m.reply(`🎄 *Tech bot v1 buscando*
 
 🎅 Nada fue encontrado…`)
       }
@@ -41,7 +41,7 @@ const handler = async (m, { conn, text, command }) => {
     } else if (isVideo) {
       await downloadMedia(conn, m, url, title, thumbnail, "mp4")
     } else {
-      await m.reply(`🎄 *Shadow — Análisis navideño*
+      await m.reply(`🎄 *Tech bot v1 — Análisis navideño*
 
 ✨ *Título:* ${title}
 🔔 *Canal:* ${authorName}
@@ -54,7 +54,7 @@ Comandos disponibles:
     }
 
   } catch (error) {
-    await m.reply(`🎄 *Shadow — Error en la magia*
+    await m.reply(`🎄 *Tech bot v1 — Error en la operación*
 
 ❌ ${error.message}`)
     await m.react("⚠️")
@@ -65,7 +65,7 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
   try {
     const cleanTitle = cleanName(title) + (type === "mp3" ? ".mp3" : ".mp4")
 
-    const msg = `🎄 *Shadow — Descarga en curso*
+    const msg = `🎄 *Tech bot v1 — Descarga en curso*
 
 ✨ *Título:* ${title}
 🎁 Preparando tu ${type === "mp3" ? "audio navideño" : "video festivo"}...`
@@ -86,8 +86,8 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
     }
 
     const apiUrl = type === "mp3"
-      ? `https://api-adonix.ultraplus.click/download/ytaudio?url=${encodeURIComponent(url)}&apikey=AdonixKeyuxuacv6765`
-      : `https://api-adonix.ultraplus.click/download/ytvideo?url=${encodeURIComponent(url)}&apikey=AdonixKeyuxuacv6765`
+      ? `https://api-adonix.ultraplus.click/download/ytaudio?url=${encodeURIComponent(url)}&apikey=DemonKeytechbot`
+      : `https://api-adonix.ultraplus.click/download/ytvideo?url=${encodeURIComponent(url)}&apikey=DemonKeytechbot`
 
     const response = await fetch(apiUrl)
     const data = await response.json()
@@ -124,7 +124,7 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
     await conn.sendMessage(
       m.chat,
       {
-        text: `🎄 *Shadow — Operación completada*
+        text: `🎄 *Tech bot v1 — Operación completada*
 
 ✨ *Título:* ${fileTitle}
 🎁 Entregado con magia navideña.`,
@@ -135,7 +135,7 @@ const downloadMedia = async (conn, m, url, title, thumbnail, type) => {
     await m.react("✅")
 
   } catch (error) {
-    await m.reply(`🎄 *Shadow — Falla en la entrega*
+    await m.reply(`🎄 *Tech bot v1 — Falla en la entrega*
 
 ❌ ${error.message}`)
     await m.react("❌")
