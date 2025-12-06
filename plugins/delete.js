@@ -1,45 +1,61 @@
-var handler = async (m, { conn, quoted }) => {
-  
-  // Solo funciona con .delete exacto
-  if (m.text === '.delete') {
-    // Si no hay mensaje respondido, NO DECIR NADA
-    if (!quoted) {
-      // Solo retorna, no envía mensaje
-      return
-    }
-    
-    try {
-      // BORRAR EL MENSAJE RESPONDIDO
-      await conn.sendMessage(m.chat, {
-        delete: {
-          remoteJid: m.chat,
-          fromMe: quoted.fromMe || false,
-          id: quoted.id,
-          participant: quoted.participant || quoted.sender
-        }
-      })
-      
-      // Reacción opcional (solo si quieres)
-      try {
-        await conn.sendMessage(m.chat, {
-          react: {
-            text: '✅',
-            key: m.key
-          }
-        })
-      } catch (e) {
-        // Si no puede reaccionar, no importa
-      }
-      
-    } catch (error) {
-      // Si falla, NO DECIR NADA
-      console.log('Error borrando:', error.message)
-    }
-    
-    // FIN - NO ENVIAR MENSAJES
-    return
-  }
-}
+const handler = async (msg, { conn }) => {
+  const chatId = msg.key.remoteJid;
+  const senderId = msg.key.participant || msg.key.remoteJid;
+  const senderClean = senderId.replace(/[^0-9]/g, "");
+  const isGroup = chatId.endsWith("@g.us");
 
-handler.command = ['delete']
-export default handler
+  if (!isGroup) {
+    await conn.sendMessage(chatId, {
+      text: "❌ Este comando solo puede usarse en grupos."
+    }, { quoted: msg });
+    return;
+  }
+
+  const metadata = await conn.groupMetadata(chatId);
+  const participante = metadata.participants.find(p => p.id === senderId);
+  const isAdmin = participante?.admin === "admin" || participante?.admin === "superadmin";
+  const isOwner = global.owner.some(([id]) => id === senderClean);
+  const isFromMe = msg.key.fromMe;
+
+  if (!isAdmin && !isOwner && !isFromMe) {
+    await conn.sendMessage(chatId, {
+      text: "🚫 Solo los administradores del grupo o el owner pueden usar este comando."
+    }, { quoted: msg });
+    return;
+  }
+
+  const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage ||
+                  msg.message?.extendedTextMessage?.contextInfo?.stanzaId;
+
+  if (!quoted) {
+    await conn.sendMessage(chatId, {
+      text: "⚠️ Responde a un mensaje para eliminarlo usando *delete*."
+    }, { quoted: msg });
+    return;
+  }
+
+  try {
+    await conn.sendMessage(chatId, {
+      delete: {
+        remoteJid: chatId,
+        fromMe: false,
+        id: msg.message.extendedTextMessage.contextInfo.stanzaId,
+        participant: msg.message.extendedTextMessage.contextInfo.participant
+      }
+    });
+
+    // Reacción ✅ al eliminar
+    await conn.sendMessage(chatId, {
+      react: { text: "✅", key: msg.key }
+    });
+
+  } catch (e) {
+    console.error("❌ Error eliminando mensaje:", e);
+    await conn.sendMessage(chatId, {
+      text: "❌ Error al intentar eliminar el mensaje."
+    }, { quoted: msg });
+  }
+};
+
+handler.command = ["delete"];
+module.exports = handler;
