@@ -1,23 +1,10 @@
 var handler = async (m, { conn, quoted }) => {
   
   if (m.text === '.delete') {
-    // Borrar inmediatamente el mensaje .delete del usuario
-    try {
-      await conn.sendMessage(m.chat, {
-        delete: {
-          remoteJid: m.chat,
-          fromMe: false,
-          id: m.id,
-          participant: m.sender
-        }
-      })
-    } catch (error) {
-      // Si falla al borrar el comando, no importa
-    }
-    
-    // Si hay mensaje respondido, borrarlo también
+    // SOLO BORRAR EL MENSAJE RESPONDIDO
     if (quoted) {
       try {
+        // Borrar el mensaje respondido
         await conn.sendMessage(m.chat, {
           delete: {
             remoteJid: m.chat,
@@ -27,16 +14,14 @@ var handler = async (m, { conn, quoted }) => {
           }
         })
       } catch (error) {
-        // Si no puede borrar, no hace nada
+        // Silencio total, no hacer nada si falla
       }
     }
     
-    return // No envía ningún mensaje, solo borra
+    // NO BORRAR EL .delete, NO DECIR NADA, SOLO BORRAR EL RESPONDIDO
+    return // Fin, sin mensajes, sin reacciones, sin nada
   }
 }
 
-handler.help = ['delete']
-handler.tags = ['tools']
-handler.command = ['delete', 'borrar', 'del']
-
+handler.command = ['delete']
 export default handler
