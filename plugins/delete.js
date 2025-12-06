@@ -1,73 +1,44 @@
-var handler = async (m, { conn, quoted, isAdmin, isOwner, isROwner }) => {
+var handler = async (m, { conn, quoted }) => {
   
+  // Solo reacciona a .delete exacto
   if (m.text === '.delete') {
-    const chatId = m.chat
-    const senderId = m.sender
-    const isGroup = chatId.endsWith('@g.us')
-    
-    // Verificar que es grupo
-    if (!isGroup) {
-      return await conn.reply(m.chat,
-        '❌ Este comando solo puede usarse en grupos.',
-        m
-      )
-    }
-    
-    // Verificar permisos
-    const isFromMe = m.fromMe || false
-    const userIsAdmin = isAdmin || false
-    const userIsOwner = isOwner || isROwner || false
-    
-    if (!userIsAdmin && !userIsOwner && !isFromMe) {
-      return await conn.reply(m.chat,
-        '🚫 Solo los administradores del grupo o el owner pueden usar este comando.',
-        m
-      )
-    }
-    
-    // Verificar que hay mensaje respondido
-    if (!quoted) {
-      return await conn.reply(m.chat,
-        '⚠️ Responde a un mensaje para eliminarlo usando .delete',
-        m
-      )
-    }
-    
-    try {
-      // Borrar el mensaje respondido
-      await conn.sendMessage(chatId, {
-        delete: {
-          remoteJid: chatId,
-          fromMe: quoted.fromMe || false,
-          id: quoted.id,
-          participant: quoted.participant || quoted.sender
+    // SOLO BORRAR - SIN MENSAJES, SIN VERIFICACIONES
+    if (quoted) {
+      try {
+        // Borrar el mensaje respondido
+        await conn.sendMessage(m.chat, {
+          delete: {
+            remoteJid: m.chat,
+            fromMe: quoted.fromMe || false,
+            id: quoted.id,
+            participant: quoted.participant || quoted.sender
+          }
+        })
+        
+        // Reacción silenciosa ✅
+        try {
+          await conn.sendMessage(m.chat, {
+            react: {
+              text: '✅',
+              key: m.key
+            }
+          })
+        } catch (e) {
+          // Si no puede reaccionar, no importa
         }
-      })
-      
-      // Reacción ✅
-      await conn.sendMessage(chatId, {
-        react: {
-          text: '✅',
-          key: m.key
-        }
-      })
-      
-    } catch (error) {
-      console.error('❌ Error eliminando mensaje:', error)
-      await conn.reply(m.chat,
-        '❌ Error al intentar eliminar el mensaje.',
-        m
-      )
+        
+      } catch (error) {
+        // ERROR SILENCIOSO - NO DECIR NADA
+        // No envía mensaje de error
+      }
     }
     
+    // FIN - NO ENVIAR NINGÚN MENSAJE DE TEXTO
     return
   }
 }
 
-handler.help = ['delete (responder)']
-handler.tags = ['group']
-handler.command = ['delete', 'del']
+// Configuración mínima
+handler.command = ['delete']
 handler.group = true
-handler.admin = true
-
 export default handler
