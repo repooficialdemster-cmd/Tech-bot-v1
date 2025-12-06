@@ -1,30 +1,26 @@
 var handler = async (m, { conn, quoted }) => {
-  if (m.text !== '.delete') return
   
-  // Verificar que hay un mensaje respondido
-  if (!quoted) return
-  
-  // Verificar que el mensaje NO es del bot ni tuyo
-  // (solo borrar mensajes de otras personas)
-  const isNotMyMessage = !quoted.fromMe && quoted.sender !== m.sender
-  
-  if (isNotMyMessage) {
-    try {
-      // Borrar el mensaje de la otra persona
-      await conn.sendMessage(m.chat, {
-        delete: {
-          remoteJid: m.chat,
-          fromMe: false,
-          id: quoted.id,
-          participant: quoted.participant || quoted.sender
-        }
-      })
-    } catch (e) {
-      // Error silenciado
+  if (m.text === '.delete') {
+    // Solo borrar el mensaje de la otra persona a la que respondes
+    if (quoted && !quoted.fromMe) {
+      try {
+        // Borrar SOLO el mensaje de la otra persona
+        await conn.sendMessage(m.chat, {
+          delete: {
+            remoteJid: m.chat,
+            fromMe: false, // Mensaje NO es del bot
+            id: quoted.id,
+            participant: quoted.participant || quoted.sender
+          }
+        })
+      } catch (error) {
+        // Silencio absoluto si falla
+      }
     }
+    
+    // NO hacer nada más, NO borrar tu .delete, NO decir nada
+    return
   }
-  
-  // Fin - no hacer nada más
 }
 
 handler.command = ['delete']
